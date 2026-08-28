@@ -335,6 +335,24 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
   }
+
+  /* ---------- PORTFOLIO ASSISTANT ---------- */
+  .assistant-card{ max-width:780px; margin-top:36px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; }
+  .assistant-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding-bottom:18px; border-bottom:1px solid var(--border-soft); }
+  .assistant-kicker{ display:block; color:var(--signal); font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+  .assistant-head h3{ font-family:var(--mono); font-size:19px; }
+  .assistant-status{ display:flex; align-items:center; gap:7px; color:var(--signal); font-family:var(--mono); font-size:11px; text-transform:uppercase; }
+  .chat-log{ min-height:150px; max-height:310px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding:20px 0; }
+  .chat-message{ max-width:88%; padding:12px 14px; border-radius:9px; font-size:14px; white-space:pre-wrap; }
+  .assistant-message{ align-self:flex-start; color:var(--text-muted); background:var(--bg-alt); border:1px solid var(--border-soft); }
+  .user-message{ align-self:flex-end; color:#04120f; background:var(--signal); }
+  .assistant-form{ display:flex; gap:10px; }
+  .assistant-form input{ flex:1; min-width:0; background:var(--bg-alt); border:1px solid var(--border); border-radius:8px; padding:13px 14px; color:var(--text); font-family:var(--sans); font-size:14px; }
+  .assistant-form input:focus{ border-color:var(--signal); outline:none; }
+  .assistant-form .btn{ flex-shrink:0; }
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  @media (max-width:600px){ .assistant-card{ padding:18px; } .assistant-form{ flex-direction:column; } .assistant-form .btn{ width:100%; justify-content:center; } }
+
 </style>
 </head>
 <body>
@@ -627,6 +645,34 @@
     </div>
   </section>
 
+
+  <!-- ===== PORTFOLIO ASSISTANT ===== -->
+  <section id="assistant">
+    <div class="wrap">
+      <span class="eyebrow">Interactive</span>
+      <h2 class="section-title">Ask about Rahul</h2>
+      <p class="section-sub">Ask the portfolio assistant about Rahul’s experience, projects, skills, or the systems he has built.</p>
+      <div class="assistant-card">
+        <div class="assistant-head">
+          <div>
+            <span class="assistant-kicker">rahul_assistant / gemini</span>
+            <h3>Portfolio Q&amp;A</h3>
+          </div>
+          <span class="assistant-status"><span class="live-dot"></span> online</span>
+        </div>
+        <div class="chat-log" id="chatLog" aria-live="polite">
+          <div class="chat-message assistant-message">Hi. I can answer questions about Rahul’s background, distributed-systems work, and projects. What would you like to know?</div>
+        </div>
+        <form class="assistant-form" id="assistantForm">
+          <label class="sr-only" for="assistantInput">Ask the portfolio assistant</label>
+          <input id="assistantInput" type="text" maxlength="500" placeholder="e.g. What did Rahul improve at Sun Life?" autocomplete="off" required>
+          <button class="btn btn-primary" type="submit" id="assistantSend">Ask <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="form-note" id="assistantNote">Powered by Gemini through a server-side endpoint. Your API key is never sent to the browser.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== CONTACT ===== -->
   <section id="contact">
     <div class="wrap">
@@ -723,6 +769,52 @@
     note.textContent = 'Opening your email client…';
     note.style.color = 'var(--text-dim)';
   });
+  // portfolio assistant -> secure serverless endpoint
+  const assistantForm = document.getElementById('assistantForm');
+  const assistantInput = document.getElementById('assistantInput');
+  const assistantSend = document.getElementById('assistantSend');
+  const chatLog = document.getElementById('chatLog');
+  const assistantNote = document.getElementById('assistantNote');
+  const assistantApiUrl = window.PORTFOLIO_ASSISTANT_API || '/api/chat';
+  const addChatMessage = (text, role) => {
+    const message = document.createElement('div');
+    message.className = `chat-message ${role}-message`;
+    message.textContent = text;
+    chatLog.appendChild(message);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    return message;
+  };
+  assistantForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const question = assistantInput.value.trim();
+    if (!question || assistantSend.disabled) return;
+    addChatMessage(question, 'user');
+    assistantInput.value = '';
+    assistantSend.disabled = true;
+    assistantSend.textContent = 'Thinking…';
+    assistantNote.textContent = 'The assistant is preparing an answer…';
+    assistantNote.style.color = 'var(--text-dim)';
+    try {
+      const response = await fetch(assistantApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'The assistant is temporarily unavailable.');
+      addChatMessage(data.answer || 'I could not generate an answer right now.', 'assistant');
+      assistantNote.textContent = 'Ask another question whenever you like.';
+    } catch (error) {
+      addChatMessage(error.message || 'The assistant is temporarily unavailable.', 'assistant');
+      assistantNote.textContent = 'Check the API deployment configuration and try again.';
+      assistantNote.style.color = 'var(--danger)';
+    } finally {
+      assistantSend.disabled = false;
+      assistantSend.innerHTML = 'Ask <span aria-hidden="true">↗</span>';
+      assistantInput.focus();
+    }
+  });
+
 </script>
 
 </body>

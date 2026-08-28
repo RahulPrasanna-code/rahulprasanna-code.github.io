@@ -1,0 +1,6 @@
+name = "rahul-portfolio-assistant"
+main = "src/index.js"
+compatibility_date = "2026-08-28"
+
+[vars]
+# The frontend origin is allowlisted in src/index.js.
