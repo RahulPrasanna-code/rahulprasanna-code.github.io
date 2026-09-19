@@ -342,8 +342,8 @@
   .assistant-kicker{ display:block; color:var(--signal); font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
   .assistant-head h3{ font-family:var(--mono); font-size:19px; }
   .assistant-status{ display:flex; align-items:center; gap:7px; color:var(--signal); font-family:var(--mono); font-size:11px; text-transform:uppercase; }
-  .chat-log{ min-height:150px; max-height:310px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding:20px 0; }
-  .chat-message{ max-width:88%; padding:12px 14px; border-radius:9px; font-size:14px; white-space:pre-wrap; }
+  .chat-log{ min-height:150px; max-height:520px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding:20px 0; }
+  .chat-message{ max-width:96%; padding:12px 14px; border-radius:9px; font-size:14px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
   .assistant-message{ align-self:flex-start; color:var(--text-muted); background:var(--bg-alt); border:1px solid var(--border-soft); }
   .user-message{ align-self:flex-end; color:#04120f; background:var(--signal); }
   .assistant-form{ display:flex; gap:10px; }
@@ -665,7 +665,7 @@
         </div>
         <form class="assistant-form" id="assistantForm">
           <label class="sr-only" for="assistantInput">Ask the portfolio assistant</label>
-          <input id="assistantInput" type="text" maxlength="500" placeholder="e.g. What did Rahul improve at Sun Life?" autocomplete="off" required>
+          <input id="assistantInput" type="text" maxlength="500" placeholder="e.g. What did Rahul improve at Fidelity Investments?" autocomplete="off" required>
           <button class="btn btn-primary" type="submit" id="assistantSend">Ask <span aria-hidden="true">↗</span></button>
         </form>
         <p class="form-note" id="assistantNote">Powered by Gemini through a server-side endpoint. Your API key is never sent to the browser.</p>

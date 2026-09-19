@@ -41,7 +41,7 @@ export default {
       const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
-        body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: question }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 300 } }),
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: question }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 700 } }),
       });
       const data = await geminiResponse.json();
       if (!geminiResponse.ok) return Response.json({ error: 'Gemini could not answer right now.' }, { status: 502, headers });
