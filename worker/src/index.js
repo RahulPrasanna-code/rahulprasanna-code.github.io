@@ -32,7 +32,7 @@ export default {
       if (!question || question.length > 500) return Response.json({ error: 'Please provide a question up to 500 characters.' }, { status: 400, headers });
       if (!env.GEMINI_API_KEY) return Response.json({ error: 'Assistant is not configured yet.' }, { status: 503, headers });
 
-      const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
+      const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
         body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: question }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 300 } }),
