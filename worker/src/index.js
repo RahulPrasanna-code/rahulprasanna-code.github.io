@@ -36,13 +36,22 @@ export default {
       const body = await request.json();
       const question = typeof body.question === 'string' ? body.question.trim() : '';
       if (!question || question.length > 500) return Response.json({ error: 'Please provide a question up to 500 characters.' }, { status: 400, headers });
+      if (/^(hi|hello|hey|good morning|good afternoon|good evening)[!.?\s]*$/i.test(question)) {
+        return Response.json({ answer: 'Hi! I am Rahul Prasanna\'s portfolio assistant. Ask me about Rahul\'s experience, achievements, technical skills, projects, or education.' }, { headers });
+      }
       if (!env.GEMINI_API_KEY) return Response.json({ error: 'Assistant is not configured yet.' }, { status: 503, headers });
 
-      const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent', {
+      const geminiRequest = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
         body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ role: 'user', parts: [{ text: question }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 700 } }),
-      });
+      };
+      let geminiResponse;
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent', geminiRequest);
+        if (geminiResponse.ok || ![429, 500, 502, 503, 504].includes(geminiResponse.status) || attempt === 2) break;
+        await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+      }
       const data = await geminiResponse.json();
       if (!geminiResponse.ok) return Response.json({ error: 'Gemini could not answer right now.' }, { status: 502, headers });
       const answer = data.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('').trim();
