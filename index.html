@@ -770,12 +770,13 @@
     note.style.color = 'var(--text-dim)';
   });
   // portfolio assistant -> secure serverless endpoint
+  window.PORTFOLIO_ASSISTANT_API = 'https://rahul-portfolio-assistant.prasannarahul22.workers.dev/';
   const assistantForm = document.getElementById('assistantForm');
   const assistantInput = document.getElementById('assistantInput');
   const assistantSend = document.getElementById('assistantSend');
   const chatLog = document.getElementById('chatLog');
   const assistantNote = document.getElementById('assistantNote');
-  const assistantApiUrl = window.PORTFOLIO_ASSISTANT_API || '/api/chat';
+  const assistantApiUrl = window.PORTFOLIO_ASSISTANT_API;
   const addChatMessage = (text, role) => {
     const message = document.createElement('div');
     message.className = `chat-message ${role}-message`;
