@@ -321,7 +321,7 @@ export default {
       };
       let geminiResponse;
       for (let attempt = 0; attempt < 1; attempt += 1) {
-        geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent', geminiRequest);
+        geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent', geminiRequest);
         if (geminiResponse.ok) break;
       }
       const data = await geminiResponse.json();
