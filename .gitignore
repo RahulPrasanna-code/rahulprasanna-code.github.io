@@ -4,3 +4,4 @@
 !.env.example
 worker/.dev.vars
 node_modules/
+worker/.wrangler
